@@ -194,7 +194,9 @@ module WillPaginate
         klass = (@owner and @reflection) ? @reflection.klass : self
 
         # Use :select from scope if it isn't already present.
-        options[:select] = scope(:find, :select) unless options[:select]
+        if options[:select].blank? && current_scoped_methods
+          options[:select] = current_scoped_methods.select_values.join(", ")
+        end
 
         if options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
           # Remove quoting and check for table_name.*-like statement.
